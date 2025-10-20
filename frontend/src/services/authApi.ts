@@ -20,7 +20,7 @@ export async function register(
     timezone,
   });
 
-  const { accessToken, refreshToken, user } = response.data;
+  const { accessToken, refreshToken, user: _user } = response.data;
   setAccessToken(accessToken);
   setRefreshToken(refreshToken);
 
@@ -36,7 +36,7 @@ export async function login(
     password,
   });
 
-  const { accessToken, refreshToken, user } = response.data;
+  const { accessToken, refreshToken, user: _user2 } = response.data;
   setAccessToken(accessToken);
   setRefreshToken(refreshToken);
 

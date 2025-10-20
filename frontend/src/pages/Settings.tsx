@@ -21,7 +21,6 @@ import {
   SaveOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '../context/AuthContext';
-import * as authApi from '../services/authApi';
 import * as linkedinApi from '../services/linkedinApi';
 
 const { Title, Text, Paragraph } = Typography;
@@ -51,7 +50,7 @@ export default function Settings() {
     }
   }, [user, form]);
 
-  const handleSave = async (values: any) => {
+  const handleSave = async (_values: any) => {
     setLoading(true);
     try {
       // In a real implementation, you would call an update user endpoint

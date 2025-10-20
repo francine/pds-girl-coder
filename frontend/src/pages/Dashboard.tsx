@@ -15,7 +15,7 @@ import * as appointmentApi from '../services/appointmentApi';
 import { Post, JobOpportunity, Appointment } from '../types/api';
 import dayjs from 'dayjs';
 
-const { Title, Paragraph } = Typography;
+const { Title } = Typography;
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
