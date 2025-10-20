@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Typography,
   Button,
@@ -31,13 +31,13 @@ import * as postApi from '../services/postApi';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
-const { RangePicker } = DatePicker;
+// const { RangePicker } = DatePicker;
 
 export default function CalendarPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [scheduledPosts, setScheduledPosts] = useState<any[]>([]);
   const [opportunities, setOpportunities] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [_loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());

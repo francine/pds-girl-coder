@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Typography,
   Button,
@@ -10,7 +10,6 @@ import {
   Select,
   message,
   Space,
-  Tag,
   Popconfirm,
 } from 'antd';
 import {
@@ -28,7 +27,7 @@ const { TextArea } = Input;
 
 export default function JobPipeline() {
   const [opportunities, setOpportunities] = useState<JobOpportunity[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [_loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingOpportunity, setEditingOpportunity] = useState<JobOpportunity | null>(null);
   const [form] = Form.useForm();

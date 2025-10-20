@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Typography,
   Button,
@@ -21,7 +21,6 @@ import {
   ClockCircleOutlined,
   CheckCircleOutlined,
   ExclamationCircleOutlined,
-  ThunderboltOutlined,
   BulbOutlined,
 } from '@ant-design/icons';
 import {
@@ -145,9 +144,13 @@ function SortableCard({ post, onEdit, onDelete, onRetry, onClick }: {
             onConfirm={() => onDelete(post._id)}
             okText="Yes"
             cancelText="No"
-            onClick={(e) => e.stopPropagation()}
           >
-            <Button type="link" danger icon={<DeleteOutlined />}>
+            <Button
+              type="link"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={(e: React.MouseEvent) => e.stopPropagation()}
+            >
               Delete
             </Button>
           </Popconfirm>,
@@ -190,7 +193,7 @@ function SortableCard({ post, onEdit, onDelete, onRetry, onClick }: {
 
 export default function ContentKanban() {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [_loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [detailsModalVisible, setDetailsModalVisible] = useState(false);
   const [generateModalVisible, setGenerateModalVisible] = useState(false);
@@ -564,12 +567,12 @@ export default function ContentKanban() {
               </>
             )}
 
-            {viewingPost.linkedInUrl && (
+            {viewingPost.linkedinUrl && (
               <>
                 <Divider style={{ margin: '12px 0' }} />
                 <div>
                   <Text strong>LinkedIn URL: </Text>
-                  <a href={viewingPost.linkedInUrl} target="_blank" rel="noopener noreferrer">
+                  <a href={viewingPost.linkedinUrl} target="_blank" rel="noopener noreferrer">
                     View on LinkedIn
                   </a>
                 </div>

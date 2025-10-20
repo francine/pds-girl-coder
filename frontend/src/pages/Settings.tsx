@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Typography,
   Card,
@@ -86,7 +86,7 @@ export default function Settings() {
           clearInterval(checkPopup);
           setConnectingLinkedIn(false);
           // Refresh user data to check if connection was successful
-          checkAuth().then((updatedUser) => {
+          checkAuth().then((updatedUser: any) => {
             if (updatedUser?.linkedinIntegration?.connected) {
               message.success('LinkedIn connected successfully!');
             }

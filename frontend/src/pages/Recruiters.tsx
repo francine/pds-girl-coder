@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Table,
   Button,
@@ -14,7 +14,10 @@ import {
   Row,
   Col,
   Popconfirm,
+  Typography,
 } from 'antd';
+
+const { Text } = Typography;
 import {
   PlusOutlined,
   LinkedinOutlined,
@@ -49,10 +52,10 @@ export default function Recruiters() {
   const [messagesModalVisible, setMessagesModalVisible] = useState(false);
   const [editingRecruiter, setEditingRecruiter] = useState<Recruiter | null>(null);
   const [selectedRecruiter, setSelectedRecruiter] = useState<Recruiter | null>(null);
-  const [searchUrls, setSearchUrls] = useState<Array<{ description: string; url: string }>>([]);
+  const [searchUrls] = useState<Array<{ description: string; url: string }>>([]);
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
   const [weeklyCount, setWeeklyCount] = useState(0);
-  const [messageLanguage, setMessageLanguage] = useState<'en' | 'pt'>('en');
+  const [_messageLanguage, _setMessageLanguage] = useState<'en' | 'pt'>('en');
   const [genericMessagesVisible, setGenericMessagesVisible] = useState(false);
   const [genericMessages, setGenericMessages] = useState<string[]>([]);
   const [form] = Form.useForm();
