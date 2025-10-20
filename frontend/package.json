@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Frontend for International Job Search Management System",
   "type": "module",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
