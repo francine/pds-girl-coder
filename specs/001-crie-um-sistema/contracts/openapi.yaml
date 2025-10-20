@@ -1,0 +1,1359 @@
+openapi: 3.0.3
+info:
+  title: International Job Search Management System API
+  description: REST API for managing LinkedIn content, job opportunities, appointments, and recruiter connections
+  version: 1.0.0
+  contact:
+    name: API Support
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Local development server
+  - url: https://api.jobsearch.example.com/v1
+    description: Production server
+
+tags:
+  - name: Auth
+    description: Authentication and user management
+  - name: Posts
+    description: LinkedIn post management
+  - name: PostIdeas
+    description: Content idea management
+  - name: Pipeline
+    description: Job opportunity pipeline tracking
+  - name: Calendar
+    description: Appointment and calendar management
+  - name: Recruiters
+    description: Recruiter discovery and connection management
+  - name: Dashboard
+    description: Aggregated metrics and insights
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        timezone:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+        linkedinIntegration:
+          type: object
+          properties:
+            connected:
+              type: boolean
+            ssiScore:
+              type: number
+              minimum: 0
+              maximum: 100
+        weeklyConnectionLimit:
+          type: integer
+        currentWeekConnectionCount:
+          type: integer
+        notifications:
+          type: object
+
+    PostIdea:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [active, used, archived]
+        usedInPostIds:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+        postIdeaId:
+          type: string
+        content:
+          type: string
+          maxLength: 3000
+        status:
+          type: string
+          enum: [draft, scheduled, published, failed]
+        scheduledAt:
+          type: string
+          format: date-time
+        publishedAt:
+          type: string
+          format: date-time
+        linkedinPostId:
+          type: string
+        linkedinUrl:
+          type: string
+          format: uri
+        metrics:
+          type: object
+          properties:
+            likes:
+              type: integer
+            comments:
+              type: integer
+            shares:
+              type: integer
+            lastUpdated:
+              type: string
+              format: date-time
+        errorMessage:
+          type: string
+        retryCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    JobOpportunity:
+      type: object
+      properties:
+        id:
+          type: string
+        company:
+          type: string
+        position:
+          type: string
+        description:
+          type: string
+        stage:
+          type: string
+          enum: [initial_contacts, in_progress, interview, proposal, negotiation, deal_closed, archived]
+        stageHistory:
+          type: array
+          items:
+            type: object
+            properties:
+              stage:
+                type: string
+              timestamp:
+                type: string
+                format: date-time
+              notes:
+                type: string
+        contactEmail:
+          type: string
+        contactName:
+          type: string
+        recruiterId:
+          type: string
+        jobPostingUrl:
+          type: string
+          format: uri
+        notes:
+          type: string
+        salary:
+          type: object
+          properties:
+            min:
+              type: number
+            max:
+              type: number
+            currency:
+              type: string
+        location:
+          type: string
+        remoteType:
+          type: string
+          enum: [remote, hybrid, onsite]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Appointment:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [interview, study_session]
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        allDay:
+          type: boolean
+        source:
+          type: string
+          enum: [manual, icalendar]
+        jobOpportunityId:
+          type: string
+        company:
+          type: string
+        location:
+          type: string
+        attendees:
+          type: array
+          items:
+            type: string
+        notificationSent:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Recruiter:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        company:
+          type: string
+        location:
+          type: string
+        industry:
+          type: string
+        linkedinProfileUrl:
+          type: string
+          format: uri
+        status:
+          type: string
+          enum: [discovered, connection_sent, connected, rejected]
+        discoveredAt:
+          type: string
+          format: date-time
+        connectionSentAt:
+          type: string
+          format: date-time
+        connectedAt:
+          type: string
+          format: date-time
+        generatedMessages:
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+              generatedAt:
+                type: string
+                format: date-time
+              used:
+                type: boolean
+        notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Dashboard:
+      type: object
+      properties:
+        weeklyPostCount:
+          type: integer
+        weeklyPostTarget:
+          type: integer
+        linkedinSSI:
+          type: number
+        upcomingPosts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        pipelineCounts:
+          type: object
+          properties:
+            initial_contacts:
+              type: integer
+            in_progress:
+              type: integer
+            interview:
+              type: integer
+            proposal:
+              type: integer
+            negotiation:
+              type: integer
+            deal_closed:
+              type: integer
+        todayAppointments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Appointment'
+        tomorrowAppointments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Appointment'
+        weeklyConnectionCount:
+          type: integer
+        weeklyConnectionLimit:
+          type: integer
+        recentRecruiters:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recruiter'
+
+security:
+  - bearerAuth: []
+
+paths:
+  # ==================== AUTH ====================
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, name]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+                name:
+                  type: string
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  accessToken:
+                    type: string
+                  refreshToken:
+                    type: string
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login with credentials
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  accessToken:
+                    type: string
+                  refreshToken:
+                    type: string
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Refresh access token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+        '401':
+          description: Invalid refresh token
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Get current user profile
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  # ==================== POST IDEAS ====================
+  /post-ideas:
+    get:
+      tags: [PostIdeas]
+      summary: Get all post ideas
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, used, archived]
+        - name: tag
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of post ideas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostIdea'
+
+    post:
+      tags: [PostIdeas]
+      summary: Create a new post idea
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, description]
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '201':
+          description: Post idea created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostIdea'
+
+  /post-ideas/{id}:
+    get:
+      tags: [PostIdeas]
+      summary: Get post idea by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Post idea
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostIdea'
+        '404':
+          description: Not found
+
+    put:
+      tags: [PostIdeas]
+      summary: Update post idea
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+                status:
+                  type: string
+      responses:
+        '200':
+          description: Updated post idea
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostIdea'
+
+    delete:
+      tags: [PostIdeas]
+      summary: Delete post idea
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+
+  # ==================== POSTS ====================
+  /posts:
+    get:
+      tags: [Posts]
+      summary: Get all posts
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: List of posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+
+    post:
+      tags: [Posts]
+      summary: Create a new post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content, status]
+              properties:
+                postIdeaId:
+                  type: string
+                content:
+                  type: string
+                status:
+                  type: string
+                scheduledAt:
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+
+  /posts/generate:
+    post:
+      tags: [Posts]
+      summary: Generate post content from idea using AI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [postIdeaId]
+              properties:
+                postIdeaId:
+                  type: string
+                tone:
+                  type: string
+                  enum: [professional, casual, technical, storytelling]
+                maxWords:
+                  type: integer
+                  default: 500
+      responses:
+        '200':
+          description: Generated post content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: string
+                  postIdeaId:
+                    type: string
+
+  /posts/suggest-topics:
+    get:
+      tags: [Posts]
+      summary: Get AI-generated topic suggestions to reach weekly target
+      responses:
+        '200':
+          description: Suggested topics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  suggestions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        title:
+                          type: string
+                        description:
+                          type: string
+                        reason:
+                          type: string
+
+  /posts/{id}:
+    get:
+      tags: [Posts]
+      summary: Get post by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+
+    put:
+      tags: [Posts]
+      summary: Update post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                status:
+                  type: string
+                scheduledAt:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Updated post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+
+    delete:
+      tags: [Posts]
+      summary: Delete post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+
+  /posts/{id}/retry:
+    post:
+      tags: [Posts]
+      summary: Retry publishing a failed post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Post queued for retry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+
+  # ==================== PIPELINE ====================
+  /opportunities:
+    get:
+      tags: [Pipeline]
+      summary: Get all job opportunities
+      parameters:
+        - name: stage
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of opportunities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JobOpportunity'
+
+    post:
+      tags: [Pipeline]
+      summary: Create a new job opportunity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [company, position, stage]
+              properties:
+                company:
+                  type: string
+                position:
+                  type: string
+                description:
+                  type: string
+                stage:
+                  type: string
+                contactEmail:
+                  type: string
+                recruiterId:
+                  type: string
+                salary:
+                  type: object
+                location:
+                  type: string
+      responses:
+        '201':
+          description: Opportunity created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobOpportunity'
+
+  /opportunities/{id}:
+    get:
+      tags: [Pipeline]
+      summary: Get opportunity by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Opportunity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobOpportunity'
+
+    put:
+      tags: [Pipeline]
+      summary: Update opportunity
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                company:
+                  type: string
+                position:
+                  type: string
+                description:
+                  type: string
+                notes:
+                  type: string
+                salary:
+                  type: object
+      responses:
+        '200':
+          description: Updated opportunity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobOpportunity'
+
+    delete:
+      tags: [Pipeline]
+      summary: Delete opportunity
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+
+  /opportunities/{id}/stage:
+    put:
+      tags: [Pipeline]
+      summary: Move opportunity to different stage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [stage]
+              properties:
+                stage:
+                  type: string
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Stage updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobOpportunity'
+
+  # ==================== CALENDAR ====================
+  /appointments:
+    get:
+      tags: [Calendar]
+      summary: Get appointments
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [interview, study_session]
+      responses:
+        '200':
+          description: List of appointments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Appointment'
+
+    post:
+      tags: [Calendar]
+      summary: Create a new appointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, startTime, endTime, type]
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                type:
+                  type: string
+                startTime:
+                  type: string
+                  format: date-time
+                endTime:
+                  type: string
+                  format: date-time
+                jobOpportunityId:
+                  type: string
+                company:
+                  type: string
+                location:
+                  type: string
+      responses:
+        '201':
+          description: Appointment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+
+  /appointments/{id}:
+    get:
+      tags: [Calendar]
+      summary: Get appointment by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Appointment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+
+    put:
+      tags: [Calendar]
+      summary: Update appointment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                startTime:
+                  type: string
+                  format: date-time
+                endTime:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Updated appointment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+
+    delete:
+      tags: [Calendar]
+      summary: Delete appointment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+
+  /icalendar:
+    post:
+      tags: [Calendar]
+      summary: Add iCalendar sync
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, icalendarUrl]
+              properties:
+                name:
+                  type: string
+                icalendarUrl:
+                  type: string
+      responses:
+        '201':
+          description: Calendar sync created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+
+  /icalendar/{id}/sync:
+    post:
+      tags: [Calendar]
+      summary: Manually trigger calendar sync
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Sync triggered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  syncStatus:
+                    type: string
+                  eventCount:
+                    type: integer
+
+  # ==================== RECRUITERS ====================
+  /recruiters:
+    get:
+      tags: [Recruiters]
+      summary: Get all recruiters
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of recruiters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recruiter'
+
+    post:
+      tags: [Recruiters]
+      summary: Add a recruiter manually
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, company, linkedinProfileUrl]
+              properties:
+                name:
+                  type: string
+                company:
+                  type: string
+                location:
+                  type: string
+                industry:
+                  type: string
+                linkedinProfileUrl:
+                  type: string
+      responses:
+        '201':
+          description: Recruiter added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recruiter'
+
+  /recruiters/search:
+    post:
+      tags: [Recruiters]
+      summary: Search for LATAM recruiters
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                regions:
+                  type: array
+                  items:
+                    type: string
+                industries:
+                  type: array
+                  items:
+                    type: string
+                keywords:
+                  type: array
+                  items:
+                    type: string
+                limit:
+                  type: integer
+                  default: 20
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recruiter'
+
+  /recruiters/{id}:
+    get:
+      tags: [Recruiters]
+      summary: Get recruiter by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Recruiter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recruiter'
+
+    put:
+      tags: [Recruiters]
+      summary: Update recruiter
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Updated recruiter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recruiter'
+
+    delete:
+      tags: [Recruiters]
+      summary: Delete recruiter
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+
+  /recruiters/{id}/generate-messages:
+    post:
+      tags: [Recruiters]
+      summary: Generate connection messages for recruiter
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                count:
+                  type: integer
+                  default: 5
+      responses:
+        '200':
+          description: Generated messages
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items:
+                      type: string
+
+  /recruiters/{id}/mark-sent:
+    post:
+      tags: [Recruiters]
+      summary: Mark connection request as sent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recruiter'
+        '400':
+          description: Weekly limit reached
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /recruiters/connection-status:
+    get:
+      tags: [Recruiters]
+      summary: Get weekly connection status
+      responses:
+        '200':
+          description: Connection status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  currentCount:
+                    type: integer
+                  limit:
+                    type: integer
+                  remaining:
+                    type: integer
+                  weekStartDate:
+                    type: string
+                    format: date
+
+  # ==================== DASHBOARD ====================
+  /dashboard:
+    get:
+      tags: [Dashboard]
+      summary: Get dashboard metrics
+      responses:
+        '200':
+          description: Dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
