@@ -173,7 +173,7 @@ async function fetchAndUpdateSSIScore(userId: string, accessToken: string): Prom
     });
 
     if (profileResponse.ok) {
-      const _profileData = await profileResponse.json() as any;
+      await profileResponse.json(); // Consume response body
       // Mock SSI score calculation (replace with real implementation)
       const mockSSIScore = Math.floor(Math.random() * 30) + 70; // 70-100
 
