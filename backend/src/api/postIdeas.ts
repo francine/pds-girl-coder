@@ -93,7 +93,7 @@ router.post('/generate-ideas', async (req: Request, res: Response, next: NextFun
 
     res.json({ ideas });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 });
 

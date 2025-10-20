@@ -11,7 +11,7 @@ import {
   getWeeklyPostCount,
 } from '../services/postService.js';
 import { generateLinkedInPost } from '../integrations/claude.js';
-import { generatePostContent, generateMultiplePosts } from '../services/postGeneratorService.js';
+import { generateMultiplePosts } from '../services/postGeneratorService.js';
 import { getPostIdeaById } from '../services/postIdeaService.js';
 import { getUserCollection } from '../models/User.js';
 import { ObjectId } from 'mongodb';
@@ -166,7 +166,7 @@ router.post('/generate', async (req: Request, res: Response, next: NextFunction)
 
     res.json({ content });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 });
 
@@ -211,7 +211,7 @@ router.post('/generate-bulk', async (req: Request, res: Response, next: NextFunc
       count: generatedPosts.length
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 });
 

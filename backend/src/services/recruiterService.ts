@@ -122,7 +122,7 @@ export async function updateRecruiterStatus(
   userId: string,
   recruiterId: string,
   newStatus: 'discovered' | 'connection_sent' | 'connected' | 'rejected',
-  notes?: string
+  _notes?: string
 ): Promise<Recruiter> {
   const collection = getRecruiterCollection();
   const now = new Date();

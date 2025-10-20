@@ -81,7 +81,7 @@ export async function handleLinkedInCallback(
       throw new ExternalServiceError('Failed to exchange LinkedIn authorization code');
     }
 
-    const tokenData = await tokenResponse.json();
+    const tokenData = await tokenResponse.json() as any;
     const accessToken = tokenData.access_token;
     const refreshToken = tokenData.refresh_token;
 
@@ -96,7 +96,7 @@ export async function handleLinkedInCallback(
       throw new ExternalServiceError('Failed to fetch LinkedIn profile');
     }
 
-    const profileData = await profileResponse.json();
+    const profileData = await profileResponse.json() as any;
 
     // Encrypt tokens before storing
     const encryptedAccessToken = encrypt(accessToken);
@@ -173,7 +173,7 @@ async function fetchAndUpdateSSIScore(userId: string, accessToken: string): Prom
     });
 
     if (profileResponse.ok) {
-      const profileData = await profileResponse.json();
+      const _profileData = await profileResponse.json() as any;
       // Mock SSI score calculation (replace with real implementation)
       const mockSSIScore = Math.floor(Math.random() * 30) + 70; // 70-100
 

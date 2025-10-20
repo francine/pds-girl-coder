@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { ExternalServiceError } from '../utils/errors.js';
 
-const client = new Anthropic({
+const client: any = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || '',
 });
 

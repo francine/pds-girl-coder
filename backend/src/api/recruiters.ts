@@ -112,7 +112,7 @@ router.get('/search/linkedin-urls', async (req: Request, res: Response, next: Ne
 
     res.json({ searchUrls });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 });
 
@@ -133,14 +133,14 @@ router.post('/:id/generate-messages', async (req: Request, res: Response, next: 
       req.params.id,
       {
         userSkills: user.skills || [],
-        userExperience: user.bio || '',
+        userExperience: (user as any).bio || '',
         language: language || 'en'
       }
     );
 
     res.json(recruiter);
   } catch (error) {
-    next(error);
+    return next(error);
   }
 });
 
