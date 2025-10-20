@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "start": "serve -s dist -l 3000",
     "preview": "vite preview",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
@@ -20,7 +21,8 @@
     "@dnd-kit/sortable": "^8.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "dayjs": "^1.11.10",
-    "react-router-dom": "^6.20.1"
+    "react-router-dom": "^6.20.1",
+    "serve": "^14.2.1"
   },
   "devDependencies": {
     "vite": "^5.0.8",
